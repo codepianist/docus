@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Facelet Title</title>
+	<style>
+.ui-widget {
+	font-size: 1em;
+}
+</style>
+</h:head>
+<h:body>
+	<h:form id="msgForm">
+		<p:growl id="globalMsgs" showDetail="true" sticky="true" />
+	</h:form>
+	<table border="0" cellpadding="5" style="margin: 0; width: 100%">
+		<tbody>
+			<tr>
+				<td colspan="2" height="50px">OrderWS</td>
+			</tr>
+			<tr>
+				<td width="75%"><h:form id="orderForm" prependId="false">
+						<p:dataTable var="order" value="#{indexBean.orders}" style="max-width: 800px;">
+							<f:facet name="header">
+						            Pedidos
+						        </f:facet>
+
+							<p:columnGroup type="header">
+								<p:row>
+									<p:column rowspan="2" headerText="Pedido" width="15%" />
+									<p:column colspan="2" headerText="Item" />
+								</p:row>
+								<p:row>
+									<p:column headerText="Nome" />
+									<p:column headerText="Preço" />
+								</p:row>
+							</p:columnGroup>
+
+							<p:subTable var="item" value="#{order.items}">
+								<f:facet name="header">
+									<h:outputText value="Pedido no. #{order.id}" />
+								</f:facet>
+								<p:column>
+									<h:outputText value="Item #{item.num}" />
+								</p:column>
+								<p:column>
+									<h:outputText value="#{item.name}" />
+								</p:column>
+								<p:column>
+									<h:outputText value="#{item.price}">
+										<f:convertNumber minFractionDigits="2" locale="pt" />
+									</h:outputText>
+								</p:column>
+								<p:columnGroup type="footer">
+									<p:row>
+										<p:column footerText="Total: " style="text-align:right" />
+										<p:column footerText="#{order.noItems}" />
+										<p:column footerText="#{order.totalAsStr}" />
+									</p:row>
+								</p:columnGroup>
+							</p:subTable>
+						</p:dataTable>
+					</h:form> <br /></td>
+			</tr>
+
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		function handleDrop(event, ui) {
+			var droppedCar = ui.draggable;
+			droppedCar.fadeOut('fast');
+		}
+	</script>
+</h:body>
+</html>
+

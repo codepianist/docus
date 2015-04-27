@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Facelet Title</title>
+	<style>
+.ui-widget {
+	font-size: .9em;
+}
+</style>
+</h:head>
+<h:body>
+	<h:form id="msgForm">
+		<p:growl id="globalMsgs" showDetail="true" sticky="true" />
+	</h:form>
+	<table border="0" cellpadding="5" style="margin: 0; width: 100%">
+		<tbody>
+			<tr>
+				<td colspan="2" height="50px">PizzApp</td>
+			</tr>
+			<tr>
+				<td width="75%"><h:form id="addForm" prependId="false">
+						<p:tabView>
+							<p:tab title="Pizzas">
+								<p:dataGrid id="dgPizzaFlavors" var="pizzaFlv"
+									value="#{pizzaBean.pizzaFlavors}" columns="3">
+									<p:panel id="pfl" header="#{pizzaFlv.name}"
+										style="text-align:center">
+										<h:panelGrid columns="1" style="width:100%">
+											<p:graphicImage library="imgs" name="peperoni.jpg"
+												height="50" />
+											<h:outputText value="#{pizzaFlv.descr}" />
+										</h:panelGrid>
+									</p:panel>
+									<p:draggable for="pfl" revert="true"
+										handle=".ui-panel-titlebar" stack=".ui-panel" />
+								</p:dataGrid>
+
+								<p:fieldset id="fsSelPizzFlavors" legend="Monte sua Pizza"
+									style="margin-top:20px">
+									<p:outputPanel id="opSelPizzaFlavors">
+										<br />
+
+										<h:outputText value="Arraste 1 ou até 4 sabores para cá."
+											rendered="#{empty pizzaBean.selPizzaFlavors}"
+											style="font-size:24px;" />
+										<p:dataTable id="selectedCarsTable" var="pizzaFlv"
+											value="#{pizzaBean.selPizzaFlavors}"
+											rendered="#{not empty pizzaBean.selPizzaFlavors}">
+											<p:column headerText="Proporção" width="10%">
+												<h:outputText
+													value="#{not empty pizzaBean.newPizza.ratio ? pizzaBean.newPizza.ratio : 1}" />
+											</p:column>
+
+											<p:column headerText="Pizza" width="30%">
+												<h:outputText value="#{pizzaFlv.name}" />
+											</p:column>
+
+											<p:column headerText="Descrição" width="40%">
+												<h:outputText value="#{pizzaFlv.descr}" />
+											</p:column>
+
+											<p:column headerText="Preço" width="20%">
+												<h:outputText value="#{pizzaFlv.price}">
+													<f:convertNumber minFractionDigits="2" locale="pt" />
+												</h:outputText>
+											</p:column>
+
+											<f:facet name="footer">
+												<h:outputText value="Total: " />
+												<h:outputText value="#{pizzaBean.newPizza.price}"
+													style="text-align: right;">
+													<f:convertNumber minFractionDigits="2" locale="pt" />
+												</h:outputText>
+											</f:facet>
+										</p:dataTable>
+									</p:outputPanel>
+								</p:fieldset>
+								<p:droppable for="fsSelPizzFlavors" tolerance="touch"
+									activeStyleClass="ui-state-highlight"
+									datasource="dgPizzaFlavors" onDrop="handleDrop">
+									<p:ajax listener="#{pizzaBean.onPizzaFlvDrop}"
+										update="opSelPizzaFlavors dgPizzaFlavors" />
+								</p:droppable>
+
+								<br />
+								<p:panelGrid>
+									<p:commandButton value="Adicionar ao Pedido"
+										icon="ui-icon-plus" action="#{pizzaBean.addPizza}"
+										update="addForm orderForm" />
+									<p:spacer width="5" />
+									<p:commandButton value="Cancelar" icon="ui-icon-cancel"
+										action="#{pizzaBean.cancel}" update="addForm" />
+								</p:panelGrid>
+
+							</p:tab>
+							<p:tab title="Bebidas">
+								<p:dataGrid id="dgBeverages" var="bev"
+									value="#{beverageBean.beverages}" columns="3">
+									<p:panel id="bv" header="#{bev.name}" style="text-align:center">
+										<h:panelGrid columns="1" style="width:100%">
+											<p:graphicImage library="imgs" name="beverages.png"
+												height="80" />
+											<p:commandButton value="Adicionar ao Pedido"
+												icon="ui-icon-plus" action="#{beverageBean.addBeverage}"
+												update="orderForm">
+												<f:setPropertyActionListener
+													target="#{beverageBean.selBeverage}" value="#{bev}" />
+											</p:commandButton>
+										</h:panelGrid>
+									</p:panel>
+								</p:dataGrid>
+							</p:tab>
+							<p:tab title="Sobremesas">
+								<p:dataGrid id="dgDesserts" var="dst"
+									value="#{dessertBean.desserts}" columns="3">
+									<p:panel id="ds" header="#{dst.name}" style="text-align:center">
+										<h:panelGrid columns="1" style="width:100%">
+											<p:graphicImage library="imgs" name="desserts.png"
+												height="90" />
+											<p:commandButton value="Adicionar ao Pedido"
+												icon="ui-icon-plus" action="#{dessertBean.addDessert}"
+												update="orderForm">
+												<f:setPropertyActionListener
+													target="#{dessertBean.selDessert}" value="#{dst}" />
+											</p:commandButton>
+										</h:panelGrid>
+									</p:panel>
+								</p:dataGrid>
+							</p:tab>
+						</p:tabView>
+					</h:form></td>
+				<td width="25%" style="vertical-align: top;"><h:form
+						id="orderForm" prependId="false">
+						<p:panel header="Pedido">
+							<p:dataTable var="prod" value="#{orderBean.order.products}"
+								style="margin-top: 3px;">
+								<p:column headerText="Produto" width="80%">
+									<h:outputText value="#{prod.name}" />
+								</p:column>
+								<p:column headerText="Preço" width="20%">
+									<h:outputText value="#{prod.price}">
+										<f:convertNumber minFractionDigits="2" locale="pt" />
+									</h:outputText>
+								</p:column>
+								<f:facet name="footer">
+									<h:outputText value="Total: " />
+									<h:outputText value="#{orderBean.order.total}"
+										style="text-align: right;">
+										<f:convertNumber minFractionDigits="2" locale="pt" />
+									</h:outputText>
+								</f:facet>
+							</p:dataTable>
+							<br />
+
+							<p:panelGrid style="">
+								<p:commandButton value="Fechar Pedido" icon="ui-icon-check"
+									action="#{orderBean.closeOrder}" update="addForm orderForm" />
+								<p:spacer width="5" />
+								<p:commandButton value="Cancelar" icon="ui-icon-cancel"
+									action="#{orderBean.cancel}" update="addForm orderForm" />
+							</p:panelGrid>
+						</p:panel>
+					</h:form> <br /></td>
+			</tr>
+
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		function handleDrop(event, ui) {
+			var droppedCar = ui.draggable;
+			droppedCar.fadeOut('fast');
+		}
+	</script>
+</h:body>
+</html>
+
